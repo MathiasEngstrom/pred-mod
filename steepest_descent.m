@@ -1,7 +1,8 @@
 function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
         
-    % Counter
+    % Counters
     t = 0;
+    n = 0;
     
     % Initiate x1 and J1
     x1 = NaN;
@@ -65,26 +66,27 @@ function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
         end
        
         % Terminate if max iterations have been reached
-        if t >= N
+        if n >= N
             disp("Maximum evaluations reached")
             break
         end
         
-        % Plot results
-        subplot(2,1,1)
-        plot(t_vector, alfa_vector);
-        title('Alfa over time')
-        xlabel('Time')
-        ylabel('Alfa')
+        if mod(t,10) == 0
+            subplot(2,1,1)
+            plot(t_vector, alfa_vector);
+            title('Alfa over time')
+            xlabel('Time')
+            ylabel('Alfa')
+
+            subplot(2,1,2)
+            plot(t_vector, J_vector);
+            title('J(x) over time')
+            xlabel('Time')
+            ylabel('J(x)')
+        end
         
-        subplot(2,1,2)
-        plot(t_vector, J_vector);
-        title('J(x) over time')
-        xlabel('Time')
-        ylabel('J(x)')
         
-        linkdata on
-        
+        n = n + 1;
   
     end
     
