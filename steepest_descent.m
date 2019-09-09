@@ -9,8 +9,12 @@ function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
     % Counter
     t = 0;
     
+    % Initiate x1 and J1
+    x1 = NaN;
+    J1 = NaN;
+    
     % Threshold
-    thresh = 10^-5;
+    thresh = 10e-5;
     
     % Store t, J and alfa values in vectors
     t_vector = 0:1:N-1;
@@ -24,7 +28,7 @@ function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
 
         % 2. Calculate the gradient in the point x0
         g = func_gradient(x0);
-        disp(g)
+
         % 3. Calculate x1
         x1 = x0 - alfa0*g;
 
@@ -33,40 +37,44 @@ function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
 
         % 5a. If J1 is less than J0, proceed with larger step
         if J1 < J0
+            
             alfa1 = (1 + beta) * alfa0;
-        end
-
-        % 5b. If the new value is larger, reduce step size
-        while J1 > J0
-
+            
+            % Store values
+            alfa_vector(t+1) = alfa0;
+            J_vector(t+1) = J1;
+            
+            %Update alfa
+            alfa0 = alfa1;
+            
+            % Update indecies
+            x0 = x1;
+            t = t + 1;
+            
+        else
+            
+            % 5b. If the new value is larger, reduce step size
+            
             % Reduce alfa
             alfa1 = (1 - beta) * alfa0;
 
-            % Calculate new x1 based on shorter step
-            x1 = x0 - alfa0*g;
-
+            % Store values
+            alfa_vector(t+1) = alfa0;
+            J_vector(t+1) = J1;
+            
             % Calculate new J1
             J1 = func(x1);
-
+            
+            % Update alfa
+            alfa0 = alfa1;
+  
         end
-        
-        % Store values
-        alfa_vector(t+1) = alfa0;
-        J_vector(t+1) = J0;
-        
-        % Update counter
-        t = t+1;
-        
-        
-        % 6. Update indicies
-        alfa0 = alfa1;
-        x0 = x1;
-        
-
-        
-        % Set output to current x and J
-        x_min = x1;
-        J_min = J1;
+       
+        % Terminate if max iterations have been reached
+        if t >= N
+            disp("Maximum evaluations reached")
+            break
+        end
         
         % Plot results
         subplot(2,1,1)
@@ -83,10 +91,11 @@ function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
         
         linkdata on
         
-        % Terminate if max iterations have been reached
-        if t > N
-            disp("Maximum evaluations reached")
-            break
-        end  
+  
     end
+    
+    linkdata off
+    % Set output to current x and J
+    x_min = x1;
+    J_min = J1;
 end
