@@ -83,12 +83,10 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
             
             % Reduce step size by reducing alfa, repeat step 4 and 5
             alfa = (1 - beta)*alfa;
-            "MINUS"
-            alfa
-            "MINUS"
+
         % 6b. The point gives a smaller J, set new point, increase step
         % size and proceed
-        else % J1 < J0
+        elseif J1 < J0
 
             % Replace xM with the new point x1
             S(:, max_index) = x1;
@@ -97,16 +95,14 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
             J_vector(t + 1) = J1;
             
             % Replace the corresponding value for x1 in J_for_S
-            J_for_S = J1;
+            J_for_S(max_index) = J1;
             
             % Store alfa
             alfa_vector(t + 1) = alfa;
             
             % Increase alfa
             alfa = (1 + beta)*alfa;
-            "PLUS"
-            alfa
-            "PLUS"
+
             % Increase iteration index t
             t = t + 1;
             
@@ -117,7 +113,7 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
 
             % 3.5 Find the index of the point in S that corresponds to 
             % the maximum
-            max_index = find(J_for_S == max(J_for_S));
+            max_index = find(J_for_S == JM);
 
             % 3.6 Get the point xM
             xM = S(:, max_index);
@@ -126,31 +122,15 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
             S_M = S(:, [1:max_index-1 max_index+1:end]);
             c = mean(S_M, 2);
             
+            % Check if we have converged
+            conv_crit = norm(x1-x0)/norm(x0);
+            x0 = x1;
+            
         end
         
         % Increase evaluation counter n
         n = n + 1;
-        
-        % Check if we have converged
-        conv_crit = norm(x1-x0)/norm(x0);
-        x0 = x1;
 
-        % Plot results for every 10 iterations
-        %if mod(t,10) == 0
-            subplot(2,1,1)
-            plot(t_vector, alfa_vector);
-            title('Alfa over time')
-            xlabel('Time')
-            ylabel('Alfa')
-
-            subplot(2,1,2)
-            plot(t_vector, J_vector);
-            title('J(x) over time')
-            xlabel('Time')
-            ylabel('J(x)')
-        
-        %end
-        
         % Terminate if max iterations reached
         if n >= N
             disp('Reached max iterations')
@@ -158,10 +138,22 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
         end
         
     end
-        
+    
+    subplot(2,1,1)
+    plot(t_vector, alfa_vector);
+    title('Alfa over number of steps t')
+    xlabel('t')
+    ylabel('Alfa')
+    
+    subplot(2,1,2)
+    plot(t_vector, J_vector);
+    title('J(x) over time')
+    xlabel('t')
+    ylabel('J(x)')
+    
     % Set output
     x_min = x1; 
     J_min = J1;     
-    
+    n
     
 end

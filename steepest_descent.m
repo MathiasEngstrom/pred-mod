@@ -74,14 +74,14 @@ function [x_min, J_min] = steepest_descent(x0, func, func_gradient, N, beta)
         if mod(t,10) == 0
             subplot(2,1,1)
             plot(t_vector, alfa_vector);
-            title('Alfa over time')
-            xlabel('Time')
+            title('Alfa number of steps t')
+            xlabel('t')
             ylabel('Alfa')
 
             subplot(2,1,2)
             plot(t_vector, J_vector);
-            title('J(x) over time')
-            xlabel('Time')
+            title('J(x) number of steps t')
+            xlabel('t')
             ylabel('J(x)')
         end
         
