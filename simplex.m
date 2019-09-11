@@ -22,7 +22,7 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
             S(:,i) = x0.*rand(d, 1) - 10*rand();
         end
     end
-    
+
     % 3.2 Calculate J for the starting points
     J_for_S = zeros(1, n_points);
     for i = 1:n_points
@@ -147,7 +147,7 @@ function [x_min, J_min] = simplex(x0, func, N, beta)
     
     subplot(2,1,2)
     plot(t_vector, J_vector);
-    title('J(x) over time')
+    title('J(x) over number of steps t')
     xlabel('t')
     ylabel('J(x)')
     
