@@ -44,8 +44,8 @@ c=1.5;
 d=2.5;
 e=4.5;
 f=5;
-g=-1.5;
-h=-0.5;
+g=1.5;
+h=0.5;
 
 % Guess for 8 first w
 w1 = [1 0];
@@ -58,13 +58,14 @@ w7 = [-1 1];
 w8 = [-1 1];
 
 b_guess=std_start_weights*randn(no_of_hidden_nodes,1);
-b_guess(1:8) = [a b c d e f g h];
+b_guess(1:8) = [-a -b -c -d -e -f -g -h];
 
 W_guess = std_start_weights*randn(no_of_hidden_nodes,N_inputs);
 W_guess(1:8, :) = [w1; w2; w3; w4; w5; w6; w7; w8];
 
 a_guess=std_start_weights*randn(1,no_of_hidden_nodes)';
-a_guess(1:8) = alpha;
+a = [alpha, -alpha, alpha, -alpha, alpha, -alpha, alpha, -alpha]';
+a_guess(1:8) = a;
 
 yo_guess=std_start_weights*randn;
 
@@ -110,14 +111,12 @@ net.trainParam.min_grad=minimum_gradient_threshold;
 
 
 % Call train which performs the actual training
-size(X_train)
-size(y)
 [trained_net,tr] = train(net,X_train,y);
 
 model = trained_net;
 
 
-%PRESENT PLOTS
+% %PRESENT PLOTS
 % figure
 % subplot(211)
 % semilogy(tr.perf,'r')
@@ -129,34 +128,28 @@ model = trained_net;
 % title('Gradient')
 % xlabel('No of iterations')
 % grid
-% 
+%  
 % y_hat_train = trained_net(X_train);
-% 
+% % 
 % rmse_train=sqrt(mean((y'-y_hat_train).^2))
-% 
+% % 
 % figure, plot(y_hat_train,y,'.')
 % grid
 % title('TRAINING DATA: yhat and y')
 % title(['TRAINING DATA: yhat and y        RMSEtrain=' num2str(rmse_train)])
-% 
-% 
-% %WRITE OUT WEIGHTS OBTIANED AFTER TRAINING
+% % 
+% % 
+% % %WRITE OUT WEIGHTS OBTIANED AFTER TRAINING
 % W_hat=trained_net.IW{1};
 % b_hat=trained_net.b{1};
 % a_hat=trained_net.LW{2,1}';
 % yo_hat=trained_net.b{2};
+% % 
+% % 
+% % 
+% % 
+% % %WRITE OUT TRUE, GUESS AND RESULTING NETWORK PARAMETERS 
 % 
-% %PERFORMANCE ON TEST DATA
-% y_hat_test = trained_net(X_test);
-% rmse_test=sqrt(mean((y_test'-y_hat_test).^2))
-% figure, plot(y_hat_test,y_test,'.')
-% grid
-% title(['EXTERNAL TEST DATA: yhattest and ytest        RMSEtest=' num2str(rmse_test)])
-% 
-% 
-% 
-% %WRITE OUT TRUE, GUESS AND RESULTING NETWORK PARAMETERS 
-% W
 % W_guess
 % 
 % W_hat
