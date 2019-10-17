@@ -18,7 +18,7 @@ N_test = 10e4;
 N_tot = N_test + N_train;
 
 % Generate 10 dimensional vectors of observations U[0,6]xU[0,6]
-X_tot = unifrnd(0, 6, [n_dim, N_tot]).*unifrnd(0, 6, [n_dim, N_tot]);
+X_tot = unifrnd(0, 6, [n_dim, N_tot]);
 
 % Generate the response, only dependent on x1 and x2
 Y_tot = zeros(N_tot, 1);
@@ -56,7 +56,7 @@ n_examples = size_X(2); % Number of x-vectors
 d = size_X(1);          % Dimension of x
 
 % Vector to remember what experiments we've done (known y-values)
-known_y_idx = zeros(1, t_max*B); 
+known_y_idx = [];
 
 % Dataset S(performed experiments), input S_X and response S_Y
 S_X = zeros(d, B);
@@ -74,22 +74,23 @@ for i=1:B
     cluster_Y = Y_train(cluster_index);
     
     % (i) point closest to cluster centroid
-    %select_index = find(distances(:, i) == min(distances(:, i)));
-    %select_index = select_index(1);
-    
-    %X_train(:, select_index);
-    %Y_train(select_index);
-    
-    % (ii) max Y of cluster
-    select_index = find(cluster_Y == max(cluster_Y));
+    select_index = find(distances(:, i) == min(distances(:, i)));
     select_index = select_index(1);
     
-    S_X(:, i) = cluster_X(:, select_index);
-    S_Y(i) = cluster_Y(select_index);
+    S_X(:, i) = X_train(:, select_index);
+    S_Y(i) = Y_train(select_index);
+    
+    % (ii) max Y of cluster
+%     select_index = find(cluster_Y == max(cluster_Y));
+%     select_index = select_index(1);
+%     
+%     S_X(:, i) = cluster_X(:, select_index);
+%     S_Y(i) = cluster_Y(select_index);
+%     select_index = cluster_index(select_index);
 
     % Points in S correspond to 'known' points(experiments performed)
     % and should not be added again
-    known_y_idx(i) = select_index;
+    known_y_idx = [known_y_idx; select_index];
 end
 
 % % TEST
@@ -126,6 +127,7 @@ while t < t_max
     title("t=" + t)
     xlabel('x1');
     ylabel('x2');
+    %axis([0 7 0 7 -inf inf]);
     % End plotting
 
     % --------------------- a. + b. ------------------------- %
@@ -208,8 +210,7 @@ while t < t_max
     [cluster_labels, C, SUMD, distances] = kmeans(X_train', k);
     
     % Theese y values are known and should not be included
-    known_y = known_y_idx(known_y_idx ~= 0);
-    known_labels = unique(cluster_labels(known_y)); % Clusters which have known y:s
+    known_labels = unique(cluster_labels(known_y_idx)); % Clusters which have known y:s
     
     % Get all cluster labels, and remove those that have known y:s in them
     clusters = unique(cluster_labels);
@@ -271,15 +272,48 @@ while t < t_max
         x_idx = X_t(b);
         S_X = [S_X, X_train(:, x_idx)];
         S_Y = [S_Y, Y_train(x_idx)];
+        known_y_idx = [known_y_idx; x_idx];
     end
     
     t = t +1;
     
 end
 
-% Plotting
+% Plotting RMSE over t
 figure
 plot(1:t_max-1, rmse_values');
 title('RMSE over t')
 xlabel('t');
 ylabel('RMSE');
+
+% Plot the mean function of all commitee members f(x) = mean(f_p(x))
+% on the interval [0,6]
+x1=0:0.1:6;
+x2=x1;
+Y = zeros(numel(x1), numel(x2));
+
+% For i rows and j columns in the matrix Y
+for i = 1:numel(x1)
+    for j = 1:numel(x2)
+        
+        f_x = zeros(P, 1); % Store each of P = 20 models output
+        
+        % Iterate over all models
+        for p = 1:P
+            model = f_p{p};                 % select model p
+            f_x(p) = model([x1(i); x2(j)]); % use model p to estimate y
+        end
+        
+        f_x_mean = mean(f_x);
+        
+        Y(i, j) = f_x_mean;
+    end
+end
+
+figure;
+mesh(x1, x2, Y)
+xlabel('x1')
+ylabel('x2')
+colorbar
+title('f(x) = mean(f_p(x))')
+% End plotting

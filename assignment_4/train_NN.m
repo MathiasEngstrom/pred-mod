@@ -99,7 +99,7 @@ net.divideParam.testRatio = 0/100;
 initial_learning_rate=10^(-8);
 max_no_of_epochs=100000;
 %performance_goal=10^(-5);
-performance_goal=0.013;
+performance_goal=0.0013;
 %performance_goal=0.055;
 minimum_gradient_threshold=10^(-10); 
 
